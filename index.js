@@ -15,7 +15,8 @@ app.use(express.json());
 app.use(logger('dev'));
 
 // Routers
-
+const categoryRouter = require('./routes/categoryRouter');
+app.use('/api/category', categoryRouter)
 
 app.listen(PORT, () => {
     console.log(`Server is listening on PORT: ${PORT}`);
