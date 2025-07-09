@@ -1,121 +1,101 @@
-🛒 MegaMart - E-Commerce Backend API
-Overview
-MegaMart is a fully functional backend API built for a simplified e-commerce platform. This project showcases backend development using Node.js, Express, and MongoDB, focusing on core functionality such as:
+# 🛒 MegaMart - E-Commerce Backend API
 
-Designing flexible data models with Mongoose
+## Overview
 
-Building a RESTful API with modular architecture
+**MegaMart** is a fully functional backend API built for a simplified e-commerce platform. This project showcases backend development using **Node.js**, **Express**, and **MongoDB**, focusing on core functionality such as:
 
-Enabling advanced product filtering, sorting, and querying
-
-Managing relationships between resources (products, customers, orders, etc.)
-
-Clean code practices with proper error handling and structured routing
+- Designing flexible data models with Mongoose  
+- Building a RESTful API with modular architecture  
+- Enabling advanced product filtering, sorting, and querying  
+- Managing relationships between resources (products, customers, orders, etc.)  
+- Clean code practices with proper error handling and structured routing  
 
 This project is backend-only and built with scalability and clarity in mind. Authentication and security layers are excluded from the current scope, but the system is ready to support those features in the future.
 
-🧩 Features
-🔍 Products
-Full CRUD operations
+---
 
-Supports advanced query filters:
+## 🧩 Features
 
-Filter by category, price range, and in-stock status
+### 🔍 Products
 
-Sort by price or name (ascending/descending)
+- Full CRUD operations  
+- Supports advanced query filters:  
+  - Filter by category, price range, and in-stock status  
+  - Sort by price or name (ascending/descending)  
+- Fields:  
+  - `name` *(string)*  
+  - `description` *(string)*  
+  - `price` *(number)*  
+  - `category` *(ref: Category)*  
+  - `stock` *(number)*  
+  - `images` *(array of URLs)*
 
-Fields:
+**Sample Query:**
 
-name (string)
-
-description (string)
-
-price (number)
-
-category (ref: Category)
-
-stock (number)
-
-images (array of URLs)
-
-Sample Query:
-
-bash
-Copy
-Edit
+```
 GET /products?category=<categoryId>&minPrice=20&maxPrice=100&inStock=true&sort=-price
-📁 Categories
-Full CRUD operations
+```
 
-Fields:
+---
 
-name (string)
+### 📁 Categories
 
-description (string)
+- Full CRUD operations  
+- Fields:  
+  - `name` *(string)*  
+  - `description` *(string)*
 
-👤 Customers
-Full CRUD operations
+---
 
-Fields:
+### 👤 Customers
 
-name (string)
+- Full CRUD operations  
+- Fields:  
+  - `name` *(string)*  
+  - `email` *(string)*  
+  - `address` *(string)*  
+  - `phone` *(string)*
 
-email (string)
+---
 
-address (string)
+### 🛒 Shopping Carts
 
-phone (string)
+- One cart per customer  
+- Cart functionality:  
+  - Add/update/remove products  
+  - Clear entire cart  
+  - Retrieve cart with total cost calculated  
+- Fields:  
+  - `customer` *(ref: Customer)*  
+  - `items` *(array of objects with `productId` and `quantity`)*
 
-🛒 Shopping Carts
-One cart per customer
+---
 
-Cart functionality:
+### 📦 Orders
 
-Add/update/remove products
+- Orders are generated from shopping carts  
+- Order lifecycle includes status management and timestamps  
+- Fields:  
+  - `customer` *(ref: Customer)*  
+  - `items` *(copied from cart)*  
+  - `total` *(calculated)*  
+  - `status` *("pending", "shipped", "delivered", "cancelled")*  
+  - `createdAt` *(timestamp)*
 
-Clear entire cart
+**Order endpoints allow:**
 
-Retrieve cart with total cost calculated
+- Placing an order from a cart  
+- Viewing a customer's order history  
+- Filtering orders by status  
+- Updating order status
 
-Fields:
+---
 
-customer (ref: Customer)
+## 🗂 Project Structure
 
-items (array of objects with productId and quantity)
-
-📦 Orders
-Orders are generated from shopping carts
-
-Order lifecycle includes status management and timestamps
-
-Fields:
-
-customer (ref: Customer)
-
-items (copied from cart)
-
-total (calculated)
-
-status ("pending", "shipped", "delivered", "cancelled")
-
-createdAt (timestamp)
-
-Order endpoints allow:
-
-Placing an order from a cart
-
-Viewing a customer's order history
-
-Filtering orders by status
-
-Updating order status
-
-🗂 Project Structure
 Organized using MVC architecture for clarity and maintainability.
 
-bash
-Copy
-Edit
+```
 /models
   Product.js
   Category.js
@@ -138,38 +118,40 @@ Edit
   orderController.js
 
 /index.js
-💡 Bonus Features
+```
+---
+
+## 💡 Bonus Features
+
 Optional extras that enhance the API:
 
-✅ Pagination with page and limit query params
+- ✅ Pagination with `page` and `limit` query params  
+- ✅ Input validation via `express-validator`  
+- ✅ Automatic stock decrement when orders are placed  
+- ✅ Customer product reviews (leave feedback and ratings)
 
-✅ Input validation via express-validator
+---
 
-✅ Automatic stock decrement when orders are placed
+## 🚀 Tech Stack
 
-✅ Customer product reviews (leave feedback and ratings)
+- **Node.js** + **Express** – API and routing  
+- **MongoDB** + **Mongoose** – NoSQL database and ODM  
+- **Postman** – For testing endpoints  
+- **dotenv** – Environment variable management  
+- **express-validator** – Middleware validation (optional)
 
-🚀 Tech Stack
-Node.js + Express – API and routing
+---
 
-MongoDB + Mongoose – NoSQL database and ODM
+## 🛠 Future Improvements
 
-Postman – For testing endpoints
+- Add authentication and user roles  
+- Implement product image uploads (e.g., Cloudinary or S3)  
+- Stripe/PayPal integration for payments  
+- Email order confirmations  
+- Admin dashboard for analytics
 
-dotenv – Environment variable management
+---
 
-express-validator – Middleware validation (optional)
+## 📬 Feedback or Ideas?
 
-🛠 Future Improvements
-Add authentication and user roles
-
-Implement product image uploads (e.g., Cloudinary or S3)
-
-Stripe/PayPal integration for payments
-
-Email order confirmations
-
-Admin dashboard for analytics
-
-📬 Feedback or Ideas?
 Got suggestions? Feel free to open an issue or drop a comment. This repo is a continuous work-in-progress, so all feedback is welcome!
