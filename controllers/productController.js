@@ -42,7 +42,7 @@ const getAllProducts = async (query) => {
         }
 
         if (query.stock === 'true') {
-            queryObject.stock = { $gt: 0 }
+            queryObject.stock = { $gte: 0 }
         }
 
         const products = await Product.find(queryObject).sort(sortObject).skip(skip).limit(limit);
