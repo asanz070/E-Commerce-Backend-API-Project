@@ -26,7 +26,7 @@ This project is backend-only and built with scalability and clarity in mind. Aut
   - `name` *(string)*  
   - `description` *(string)*  
   - `price` *(number)*  
-  - `category` *(ref: Category)*  
+  - `category` *(string)*  
   - `stock` *(number)*  
   - `images` *(array of URLs)*
 

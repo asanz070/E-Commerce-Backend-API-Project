@@ -11,11 +11,11 @@ const createCategory = async (categoryData) => {
     }
 }
 
-// Get Category
+// Get Categories
 const getAllCategory = async () => {
     try {
-        const category = await Category.find();
-        return category
+        const getCategory = await Category.find();
+        return getCategory
     } catch (error) {
         throw error
     }
