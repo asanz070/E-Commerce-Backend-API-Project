@@ -24,6 +24,9 @@ app.use('/api/products', productRouter)
 const customerRouter = require('./routes/customerRouter');
 app.use('/api/customer', customerRouter)
 
+const cartRouter = require('./routes/cartRouter');
+app.use('/api/cart', cartRouter)
+
 app.listen(PORT, () => {
     console.log(`Server is listening on PORT: ${PORT}`);
     connectToMongoDB();

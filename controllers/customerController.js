@@ -21,7 +21,18 @@ const getAllCustomer = async () => {
     }
 }
 
+// Get Customer by id
+const getCustomerById = async (id) => {
+    try {
+        const customerId = await Customer.findById(id)
+        return customerId
+    } catch (error) {
+        throw error
+    }
+}
+
 module.exports = {
     createCustomer,
     getAllCustomer,
+    getCustomerById
 }

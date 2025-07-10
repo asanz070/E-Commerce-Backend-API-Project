@@ -52,7 +52,17 @@ const getAllProducts = async (query) => {
     }
 }
 
+const getProductById = async (id) => {
+    try {
+        const productId = await Product.findById(id)
+        return productId
+    } catch (error) {
+        throw error
+    }
+}
+
 module.exports = {
     createProduct,
-    getAllProducts
+    getAllProducts,
+    getProductById
 }
