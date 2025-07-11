@@ -24,7 +24,6 @@ router.get('/:customerId', async (request, response) => {
 
 router.post('/', async (request, response) => {
     try {
-        console.log()
         const newCart = await createCart(request.body);
         response.status(200).json({ message: 'success', payload: newCart })
     } catch (error) {
