@@ -2,16 +2,33 @@
 const express = require('express');
 const router = express.Router();
 
-const { getCart, getCartByCustomerId, createCart, addItemToCart, updateItemQuantity, removeItemFromCart, clearCart } = require('../controllers/cartController');
+const {
+    createOrReplaceCart,
+    //   getCart, 
+    getCartByCustomerId,
+    addItemToCart,
+    updateItemQuantity,
+    removeItemFromCart,
+    clearCart
+} = require('../controllers/cartController');
 
-router.get('/', async (request, response) => {
+// router.get('/', async (request, response) => {
+//     try {
+//         const fullCart = await getCart();
+//         response.status(200).json({ message: 'success', payload: fullCart })
+//     } catch (error) {
+//         response.status(404).json({ message: 'failure', payload: error })
+//     }
+// })
+
+router.post('/create-or-replace', async (req, res) => {
     try {
-        const fullCart = await getCart();
-        response.status(200).json({ message: 'success', payload: fullCart })
+        const newCart = await createOrReplaceCart(req, res);
+        // It's already handling the response inside the controller
     } catch (error) {
-        response.status(404).json({ message: 'failure', payload: error })
+        res.status(400).json({ message: 'failure', payload: error.message });
     }
-})
+});
 
 router.get('/:customerId', async (request, response) => {
     try {
@@ -21,15 +38,6 @@ router.get('/:customerId', async (request, response) => {
         response.status(400).json({ message: 'failure', payload: error });
     }
 });
-
-router.post('/', async (request, response) => {
-    try {
-        const newCart = await createCart(request.body);
-        response.status(200).json({ message: 'success', payload: newCart })
-    } catch (error) {
-        response.status(400).json({ message: 'failure', payload: error.message })
-    }
-})
 
 router.post('/:customerId/add', async (request, response) => {
     try {
@@ -54,7 +62,7 @@ router.put('/:customerId/update/:productId', async (request, response) => {
     }
 });
 
-router.delete('/customerId/remove/:productId', async (request, response) => {
+router.delete('/:customerId/remove/:productId', async (request, response) => {
     try {
         const { customerId, productId } = request.params;
         const updatedCart = await removeItemFromCart(customerId, productId);
@@ -65,17 +73,17 @@ router.delete('/customerId/remove/:productId', async (request, response) => {
     }
 })
 
-router.delete('/customerId/clear', async (request, response) => {
+router.delete('/:customerId/clear', async (request, response) => {
     try {
         const { customerId } = request.params;
         const clearedCart = await clearCart(customerId)
         response.status(200).json({ message: 'success', payload: clearedCart })
     } catch (error) {
-        response.status(400).json({ message:'failure', payload: error.message })
+        response.status(400).json({ message: 'failure', payload: error.message })
     }
 })
 
-router.get('/customerId/total', async (request, response) => {
+router.get('/:customerId/total', async (request, response) => {
     try {
         const { customerId } = request.params;
         const result = await getCartWithTotal(customerId);
