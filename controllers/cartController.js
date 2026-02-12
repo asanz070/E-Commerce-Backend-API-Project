@@ -1,83 +1,44 @@
-// ECHO is on
 const Cart = require('../models/cartModel');
 const Product = require('../models/productModel');
 
-// ✅ Get Cart by Customer ID
-const getCartByCustomerId = async (req, res) => {
+// Helper function to calculate total
+const calculateTotal = (items) => {
+  return items.reduce((sum, item) => {
+    return sum + (item.productId.price * item.quantity);
+  }, 0);
+};
+
+// Get Cart by Customer ID
+const getCartByCustomerId = async (customerId) => {
   try {
-    const customerId = req.params.customerId;
     const cart = await Cart.findOne({ customer: customerId })
       .populate('customer', 'name email')
       .populate('items.productId', 'name category price');
 
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found for this customer.' });
+    if (cart) {
+      cart.total = calculateTotal(cart.items);
     }
 
-    const total = cart.items.reduce((acc, item) => {
-      return acc + (item.productId.price * item.quantity);
-    }, 0);
-
-    res.json({ cart, total });
+    return cart;
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    throw error;
   }
 };
 
-// ✅ Create or Replace Cart with Array of Items
-const createOrReplaceCart = async (req, res) => {
+// Add Item to Cart
+const addItemToCart = async (customerId, productId, quantity) => {
   try {
-    const { customer, items } = req.body;
 
-    if (!customer || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ message: 'Customer and a non-empty items array are required.' });
-    }
+    const product = await Product.findOne({ product: productId })
 
-    // Validate all products
-    for (const item of items) {
-      if (!item.productId || typeof item.quantity !== 'number') {
-        return res.status(400).json({ message: 'Each item must include productId and quantity (number).' });
-      }
-
-      const product = await Product.findById(item.productId);
-      if (!product) {
-        return res.status(404).json({ message: `Product not found: ${item.productId}` });
-      }
-    }
-
-    // Create or replace cart
-    let cart = await Cart.findOneAndUpdate(
-      { customer },
-      { customer, items },
-      { new: true, upsert: true, runValidators: true }
-    );
-
-    cart = await cart.populate('items.productId', 'name price');
-    res.status(201).json(cart);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// ✅ Add a Single Item to Cart
-const addItemToCart = async (req, res) => {
-  const { productId, quantity } = req.body;
-  const customerId = req.params.customerId;
-
-  try {
-    if (quantity < 1) {
-      return res.status(400).json({ message: 'Quantity must be at least 1.' });
-    }
-
-    const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found.' });
+      throw error
     }
 
     let cart = await Cart.findOne({ customer: customerId });
 
     if (!cart) {
-      cart = new Cart({
+      cart = await Cart.create({
         customer: customerId,
         items: [{ productId, quantity }]
       });
@@ -91,80 +52,73 @@ const addItemToCart = async (req, res) => {
       } else {
         cart.items.push({ productId, quantity });
       }
+      await cart.save();
     }
 
-    await cart.save();
-    const populatedCart = await cart.populate('items.productId', 'name price');
-    res.json(populatedCart);
+    return await cart.populate('items.productId', 'name category price');
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    throw error;
   }
 };
 
-// ✅ Remove an Item from Cart
-const removeItemFromCart = async (req, res) => {
-  const customerId = req.params.customerId;
-  const { productId } = req.body;
-
+// Remove Item from Cart
+const removeItemFromCart = async (customerId, productId) => {
   try {
     const cart = await Cart.findOne({ customer: customerId });
-    if (!cart) return res.status(404).json({ message: 'Cart not found.' });
+
+    if (!cart) throw new Error('Cart not found');
 
     cart.items = cart.items.filter(
       item => item.productId.toString() !== productId
     );
-
     await cart.save();
-    res.json({ message: 'Item removed successfully.', cart });
+
+    return await cart.populate('items.productId', 'name category price');
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    throw error;
   }
 };
 
-// ✅ Update Quantity for a Product in Cart
-const updateItemQuantity = async (req, res) => {
-  const customerId = req.params.customerId;
-  const { productId, quantity } = req.body;
-
+// Update Item Quantity
+const updateItemQuantity = async (customerId, productId, quantity) => {
   try {
     const cart = await Cart.findOne({ customer: customerId });
-    if (!cart) return res.status(404).json({ message: 'Cart not found.' });
+
+    if (!cart) throw new Error('Cart not found');
 
     const item = cart.items.find(
       item => item.productId.toString() === productId
     );
 
-    if (!item) return res.status(404).json({ message: 'Item not found in cart.' });
+    if (!item) throw new Error('Item not found in cart');
 
     item.quantity = quantity;
     await cart.save();
 
-    res.json({ message: 'Quantity updated successfully.', cart });
+    return await cart.populate('items.productId', 'name category price');
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    throw error;
   }
 };
 
-// ✅ Clear All Items from Cart
-const clearCart = async (req, res) => {
-  const customerId = req.params.customerId;
-
+// Clear Cart
+const clearCart = async (customerId) => {
   try {
     const cart = await Cart.findOne({ customer: customerId });
-    if (!cart) return res.status(404).json({ message: 'Cart not found.' });
+
+    if (!cart) throw new Error('Cart not found');
 
     cart.items = [];
     await cart.save();
 
-    res.json({ message: 'Cart cleared.', cart });
+    return cart;
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    throw error;
   }
 };
 
 module.exports = {
   getCartByCustomerId,
-  createOrReplaceCart,
   addItemToCart,
   updateItemQuantity,
   removeItemFromCart,
